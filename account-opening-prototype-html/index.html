@@ -309,9 +309,36 @@
     opacity: 1; transform: scale(1);
   }
   #screen-industry .employment-radio::before,
+  #screen-industry-b-step2 .employment-radio::before,
   #screen-annual-income .employment-radio::before,
   #screen-net-worth .employment-radio::before {
     background: transparent;
+  }
+
+  .industry-chevron {
+    flex-shrink: 0; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .industry-compare-toggle__inner {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .industry-compare-toggle__switch {
+    position: relative; width: 44px; height: 26px; padding: 0;
+    border: none; border-radius: 9999px; cursor: pointer;
+    background-color: rgba(198,178,159,0.6);
+    transition: background-color 160ms ease;
+  }
+  .industry-compare-toggle__switch[aria-checked="true"] {
+    background-color: #045e58;
+  }
+  .industry-compare-toggle__knob {
+    position: absolute; top: 2px; left: 2px; width: 22px; height: 22px;
+    border-radius: 9999px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: transform 160ms ease;
+  }
+  .industry-compare-toggle__switch[aria-checked="true"] .industry-compare-toggle__knob {
+    transform: translateX(18px);
   }
 
   .terms-checkbox {
@@ -2660,8 +2687,20 @@
       </div>
     </div>
 
+    <!-- ======================= 00 · FLOW PICKER (moderator only, not part of the real onboarding flow) ======================= -->
+    <div class="screen" id="screen-flow-picker" aria-label="Flow picker" style="z-index:3;">
+      <div class="home-indicator"><div class="pill" style="background:rgba(0,0,0,0.18);"></div></div>
+      <main style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:24px;">
+        <h1 style="margin:0 0 8px; font-family:'N26 Sans', sans-serif; font-weight:500; font-size:24px; line-height:32px; color:#1b1b1b; text-align:center;">Choose a flow</h1>
+        <div role="group" aria-label="Flow selection" style="width:100%; max-width:320px; display:flex; flex-direction:column; gap:16px;">
+          <button role="button" aria-label="Flow A" class="pill-btn pill-btn--primary" onclick="selectFlow('a')">Flow A</button>
+          <button role="button" aria-label="Flow B" class="pill-btn pill-btn--primary" onclick="selectFlow('b')">Flow B</button>
+        </div>
+      </main>
+    </div>
+
     <!-- ======================= 01 · WELCOME ======================= -->
-    <div class="screen" id="screen-welcome" aria-label="Welcome" style="background:#000; z-index:2;">
+    <div class="screen" id="screen-welcome" aria-label="Welcome" style="display:none; background:#000; z-index:2;">
       <div class="home-indicator"><div class="pill" style="background:rgba(255,255,255,0.4);"></div></div>
 
       <video aria-hidden="true" src="./intro.mov" autoplay loop muted playsinline style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;"></video>
@@ -3408,6 +3447,9 @@
           <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M2.68945 12L11.4697 3.21973L12.5303 4.28027L7.26765 9.54289C6.63769 10.1729 7.08386 11.25 7.97476 11.25H21V12.75H7.97476C7.08386 12.75 6.63769 13.8271 7.26765 14.4571L12.5303 19.7197L11.4697 20.7803L2.68945 12Z" fill="#1b1b1b"/></svg>
         </button>
       </nav>
+      <nav aria-label="Comparison toggle" style="position:absolute; top:16px; right:16px; z-index:10;">
+        <div id="industry-a-compare-toggle" class="industry-compare-toggle" style="display:none;"></div>
+      </nav>
 
       <main style="position:absolute; inset:0; overflow-y:auto; padding:118px 24px 220px;">
         <h1 style="margin:0 0 8px; font-family:'N26 Sans', sans-serif; font-weight:500; font-size:32px; line-height:40px; color:#1b1b1b; font-feature-settings:'lnum' 1, 'tnum' 1;">What industry do you work in?</h1>
@@ -3419,115 +3461,287 @@
         </div>
 
         <div role="radiogroup" aria-label="Industry" id="industry-list" style="display:flex; flex-direction:column;">
-          <button type="button" class="employment-cell" data-industry="accommodation-food-services" data-label="accommodation & food services hotels restaurants bars catering" role="radio" aria-checked="false" onclick="selectIndustry('accommodation-food-services')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Accommodation & food services</span><span class="employment-cell__description">Hotels, restaurants, bars, catering</span></span>
+          <button type="button" class="employment-cell" data-industry="agriculture-farming" data-label="agriculture or farming forestry fishing" role="radio" aria-checked="false" onclick="selectIndustry('agriculture-farming')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Agriculture or Farming</span><span class="employment-cell__description">Forestry, fishing</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="administrative-support-services" data-label="administrative & support services office admin cleaning services security" role="radio" aria-checked="false" onclick="selectIndustry('administrative-support-services')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Administrative & support services</span><span class="employment-cell__description">Office admin, cleaning services, security</span></span>
+          <button type="button" class="employment-cell" data-industry="art-jewelry" data-label="art & jewelry antiques pawnbroking" role="radio" aria-checked="false" onclick="selectIndustry('art-jewelry')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Art & jewelry</span><span class="employment-cell__description">Antiques, pawnbroking</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="agriculture-forestry-fishing" data-label="agriculture, forestry and fishing" role="radio" aria-checked="false" onclick="selectIndustry('agriculture-forestry-fishing')">
-            <span class="employment-cell__label">Agriculture, forestry and fishing</span>
+          <button type="button" class="employment-cell" data-industry="banking-insurance" data-label="banking & insurance banks insurance companies" role="radio" aria-checked="false" onclick="selectIndustry('banking-insurance')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Banking & insurance</span><span class="employment-cell__description">Banks, insurance companies</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="banking-insurance-financial-services" data-label="banking, insurance & financial services" role="radio" aria-checked="false" onclick="selectIndustry('banking-insurance-financial-services')">
-            <span class="employment-cell__label">Banking, insurance & financial services</span>
+          <button type="button" class="employment-cell" data-industry="charities-religious-organisations" data-label="charities & religious organisations foundations religious institutions" role="radio" aria-checked="false" onclick="selectIndustry('charities-religious-organisations')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Charities & religious organisations</span><span class="employment-cell__description">Foundations, religious institutions</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="construction-architecture-engineering" data-label="construction, architecture & engineering building civil engineering architecture firms" role="radio" aria-checked="false" onclick="selectIndustry('construction-architecture-engineering')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Construction, architecture & engineering</span><span class="employment-cell__description">Building, civil engineering, architecture firms</span></span>
+          <button type="button" class="employment-cell" data-industry="construction-engineering" data-label="construction & engineering building architecture firms" role="radio" aria-checked="false" onclick="selectIndustry('construction-engineering')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Construction & engineering</span><span class="employment-cell__description">Building, architecture firms</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="cryptocurrency-digital-assets" data-label="cryptocurrency & digital assets" role="radio" aria-checked="false" onclick="selectIndustry('cryptocurrency-digital-assets')">
-            <span class="employment-cell__label">Cryptocurrency & digital assets</span>
+          <button type="button" class="employment-cell" data-industry="crypto" data-label="crypto trading digital assets" role="radio" aria-checked="false" onclick="selectIndustry('crypto')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Crypto</span><span class="employment-cell__description">Trading, digital assets</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="design-advertising-marketing-services" data-label="design, advertising & marketing services" role="radio" aria-checked="false" onclick="selectIndustry('design-advertising-marketing-services')">
-            <span class="employment-cell__label">Design, advertising & marketing services</span>
+          <button type="button" class="employment-cell" data-industry="design-marketing" data-label="design & marketing branding product design" role="radio" aria-checked="false" onclick="selectIndustry('design-marketing')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Design & marketing</span><span class="employment-cell__description">Branding, product design</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="education-science" data-label="education and science" role="radio" aria-checked="false" onclick="selectIndustry('education-science')">
-            <span class="employment-cell__label">Education and science</span>
+          <button type="button" class="employment-cell" data-industry="education-science" data-label="education & science schools research institutes" role="radio" aria-checked="false" onclick="selectIndustry('education-science')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Education & science</span><span class="employment-cell__description">Schools, research institutes</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="energy-water-waste-management" data-label="energy, water & waste management" role="radio" aria-checked="false" onclick="selectIndustry('energy-water-waste-management')">
-            <span class="employment-cell__label">Energy, water & waste management</span>
+          <button type="button" class="employment-cell" data-industry="energy-utilities" data-label="energy & utilities water waste management" role="radio" aria-checked="false" onclick="selectIndustry('energy-utilities')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Energy & utilities</span><span class="employment-cell__description">Water, waste management</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="gambling" data-label="gambling casinos betting shops online gambling" role="radio" aria-checked="false" onclick="selectIndustry('gambling')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Gambling</span><span class="employment-cell__description">Casinos, betting shops, online gambling</span></span>
+          <button type="button" class="employment-cell" data-industry="gambling" data-label="gambling casinos betting shops" role="radio" aria-checked="false" onclick="selectIndustry('gambling')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Gambling</span><span class="employment-cell__description">Casinos, betting shops</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="health-social-welfare-veterinary-services" data-label="health, social welfare & veterinary services" role="radio" aria-checked="false" onclick="selectIndustry('health-social-welfare-veterinary-services')">
-            <span class="employment-cell__label">Health, social welfare & veterinary services</span>
+          <button type="button" class="employment-cell" data-industry="healthcare" data-label="healthcare social care veterinary services" role="radio" aria-checked="false" onclick="selectIndustry('healthcare')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Healthcare</span><span class="employment-cell__description">Social care, veterinary services</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="art-jewelry-pawn" data-label="high value art, jewelry and pawn shops" role="radio" aria-checked="false" onclick="selectIndustry('art-jewelry-pawn')">
-            <span class="employment-cell__label">High value art, jewelry and pawn shops</span>
+          <button type="button" class="employment-cell" data-industry="hospitality" data-label="hospitality hotels restaurants catering" role="radio" aria-checked="false" onclick="selectIndustry('hospitality')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Hospitality</span><span class="employment-cell__description">Hotels, restaurants, catering</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="legal-tax-accounting-services" data-label="legal, tax and accounting services law firms accountants tax advisors" role="radio" aria-checked="false" onclick="selectIndustry('legal-tax-accounting-services')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Legal, tax and accounting services</span><span class="employment-cell__description">Law firms, accountants, tax advisors</span></span>
+          <button type="button" class="employment-cell" data-industry="legal-accounting" data-label="legal & accounting law firms tax advisors" role="radio" aria-checked="false" onclick="selectIndustry('legal-accounting')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Legal & accounting</span><span class="employment-cell__description">Law firms, tax advisors</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="manufacturing-industrial-production" data-label="manufacturing & industrial production food & drink production textiles electronics" role="radio" aria-checked="false" onclick="selectIndustry('manufacturing-industrial-production')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Manufacturing & industrial production</span><span class="employment-cell__description">Food & drink production, textiles, electronics</span></span>
+          <button type="button" class="employment-cell" data-industry="manufacturing" data-label="manufacturing food & drink textiles" role="radio" aria-checked="false" onclick="selectIndustry('manufacturing')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Manufacturing</span><span class="employment-cell__description">Food & drink, textiles</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="media-arts-entertainment" data-label="media, arts, entertainment film & tv publishing journalism museums sports clubs" role="radio" aria-checked="false" onclick="selectIndustry('media-arts-entertainment')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Media, arts, entertainment</span><span class="employment-cell__description">Film & TV, publishing, journalism, museums, sports clubs</span></span>
+          <button type="button" class="employment-cell" data-industry="media-entertainment" data-label="media & entertainment film & tv publishing museums" role="radio" aria-checked="false" onclick="selectIndustry('media-entertainment')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Media & entertainment</span><span class="employment-cell__description">Film & TV, publishing, museums</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="mining-quarrying" data-label="mining and quarrying" role="radio" aria-checked="false" onclick="selectIndustry('mining-quarrying')">
-            <span class="employment-cell__label">Mining and quarrying</span>
+          <button type="button" class="employment-cell" data-industry="mining-quarrying" data-label="mining & quarrying metals & minerals oil & gas" role="radio" aria-checked="false" onclick="selectIndustry('mining-quarrying')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Mining & quarrying</span><span class="employment-cell__description">Metals & minerals, oil & gas</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="personal-household-services" data-label="other personal & household services hairdressing domestic staff repair of personal goods" role="radio" aria-checked="false" onclick="selectIndustry('personal-household-services')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Other personal & household services</span><span class="employment-cell__description">Hairdressing, domestic staff, repair of personal goods</span></span>
+          <button type="button" class="employment-cell" data-industry="office-cleaning-security-services" data-label="office, cleaning & security services office admin security services" role="radio" aria-checked="false" onclick="selectIndustry('office-cleaning-security-services')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Office, cleaning & security services</span><span class="employment-cell__description">Office admin, security services</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="public-services-military" data-label="public services and military" role="radio" aria-checked="false" onclick="selectIndustry('public-services-military')">
-            <span class="employment-cell__label">Public services and military</span>
+          <button type="button" class="employment-cell" data-industry="personal-services" data-label="personal services hairdressing domestic staff repairs" role="radio" aria-checked="false" onclick="selectIndustry('personal-services')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Personal services</span><span class="employment-cell__description">Hairdressing, domestic staff, repairs</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="real-estate" data-label="real estate property sales rentals real estate management" role="radio" aria-checked="false" onclick="selectIndustry('real-estate')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Real estate</span><span class="employment-cell__description">Property sales, rentals, real estate management</span></span>
+          <button type="button" class="employment-cell" data-industry="public-services-military" data-label="public services & military public administration customs police" role="radio" aria-checked="false" onclick="selectIndustry('public-services-military')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Public services & military</span><span class="employment-cell__description">Public administration, customs, police</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="telecommunications-it" data-label="telecommunications & it mobile & internet providers software development it support" role="radio" aria-checked="false" onclick="selectIndustry('telecommunications-it')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Telecommunications & IT</span><span class="employment-cell__description">Mobile & internet providers, software development, IT support</span></span>
+          <button type="button" class="employment-cell" data-industry="real-estate" data-label="real estate rentals management" role="radio" aria-checked="false" onclick="selectIndustry('real-estate')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Real estate</span><span class="employment-cell__description">Rentals, management</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="transportation-storage-logistics" data-label="transportation, storage & logistics" role="radio" aria-checked="false" onclick="selectIndustry('transportation-storage-logistics')">
-            <span class="employment-cell__label">Transportation, storage & logistics</span>
+          <button type="button" class="employment-cell" data-industry="telecom-it" data-label="telecom & it internet providers software development" role="radio" aria-checked="false" onclick="selectIndustry('telecom-it')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Telecom & IT</span><span class="employment-cell__description">Internet providers, software development</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="travel-agencies-tour-operators" data-label="travel agencies & tour operators" role="radio" aria-checked="false" onclick="selectIndustry('travel-agencies-tour-operators')">
-            <span class="employment-cell__label">Travel agencies & tour operators</span>
+          <button type="button" class="employment-cell" data-industry="transport-logistics" data-label="transport & logistics storage freight" role="radio" aria-checked="false" onclick="selectIndustry('transport-logistics')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Transport & logistics</span><span class="employment-cell__description">Storage, freight</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="trusts-charities-religious-organisations" data-label="trusts, charities & religious organisations charities foundations religious institutions" role="radio" aria-checked="false" onclick="selectIndustry('trusts-charities-religious-organisations')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Trusts, charities & religious organisations</span><span class="employment-cell__description">Charities, foundations, religious institutions</span></span>
+          <button type="button" class="employment-cell" data-industry="travel-tourism" data-label="travel & tourism tour operators booking platforms" role="radio" aria-checked="false" onclick="selectIndustry('travel-tourism')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Travel & tourism</span><span class="employment-cell__description">Tour operators, booking platforms</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="vehicle-trade-repair" data-label="vehicle trade & repair" role="radio" aria-checked="false" onclick="selectIndustry('vehicle-trade-repair')">
-            <span class="employment-cell__label">Vehicle trade & repair</span>
+          <button type="button" class="employment-cell" data-industry="vehicle-trade-repair" data-label="vehicle trade & repair dealerships maintenance" role="radio" aria-checked="false" onclick="selectIndustry('vehicle-trade-repair')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Vehicle trade & repair</span><span class="employment-cell__description">Dealerships, maintenance</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-industry="weapons-ammunition-defence-trade" data-label="weapons, ammunition & defence trade firearms ammunition defense equipment" role="radio" aria-checked="false" onclick="selectIndustry('weapons-ammunition-defence-trade')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Weapons, ammunition & defence trade</span><span class="employment-cell__description">Firearms, ammunition, defense equipment</span></span>
+          <button type="button" class="employment-cell" data-industry="weapons-defence" data-label="weapons & defence firearms defence equipment" role="radio" aria-checked="false" onclick="selectIndustry('weapons-defence')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Weapons & defence</span><span class="employment-cell__description">Firearms, defence equipment</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell employment-cell--last" data-industry="wholesale-retail" data-label="wholesale & retail shops online retail wholesale distribution" role="radio" aria-checked="false" onclick="selectIndustry('wholesale-retail')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Wholesale & retail</span><span class="employment-cell__description">Shops, online retail, wholesale distribution</span></span>
+          <button type="button" class="employment-cell employment-cell--last" data-industry="wholesale-retail" data-label="wholesale & retail shops wholesale distribution" role="radio" aria-checked="false" onclick="selectIndustry('wholesale-retail')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Wholesale & retail</span><span class="employment-cell__description">Shops, wholesale distribution</span></span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
         </div>
       </main>
 
       <footer style="position:absolute; bottom:0; left:0; right:0; padding:0 16px 34px; background-color:#faf8f5;">
-        <button aria-label="Continue" class="pill-btn pill-btn--primary" onclick="guardedNavigate('screen-industry','screen-income-source','forward', industrySelected !== null)">Continue</button>
+        <button aria-label="Continue" class="pill-btn pill-btn--primary" onclick="industryAContinue()">Continue</button>
+      </footer>
+    </div>
+
+    <!-- ======================= 10B · INDUSTRY (OPTION B, STEP 1) ======================= -->
+    <div class="screen" id="screen-industry-b-step1" style="display:none;">
+      <div class="home-indicator"><div class="pill" style="background:rgba(0,0,0,0.18);"></div></div>
+
+      <nav aria-label="Page navigation" style="position:absolute; top:16px; left:16px; z-index:10;">
+        <button aria-label="Back" class="flat-btn-light" onclick="navigate('screen-industry-b-step1','screen-employment-status','backward')">
+          <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M2.68945 12L11.4697 3.21973L12.5303 4.28027L7.26765 9.54289C6.63769 10.1729 7.08386 11.25 7.97476 11.25H21V12.75H7.97476C7.08386 12.75 6.63769 13.8271 7.26765 14.4571L12.5303 19.7197L11.4697 20.7803L2.68945 12Z" fill="#1b1b1b"/></svg>
+        </button>
+      </nav>
+      <nav aria-label="Comparison toggle" style="position:absolute; top:16px; right:16px; z-index:10;">
+        <div id="industry-b1-compare-toggle" class="industry-compare-toggle" style="display:none;"></div>
+      </nav>
+
+      <main style="position:absolute; inset:0; overflow-y:auto; padding:118px 24px 220px;">
+        <h1 style="margin:0 0 8px; font-family:'N26 Sans', sans-serif; font-weight:500; font-size:32px; line-height:40px; color:#1b1b1b; font-feature-settings:'lnum' 1, 'tnum' 1;">What industry do you work in?</h1>
+        <p style="margin:0 0 24px; font-family:'GT America', sans-serif; font-size:16px; line-height:20px; color:#525252;">Select the industry related to your current job, not your profession.</p>
+
+        <div style="display:flex; align-items:center; gap:8px; height:48px; padding:0 16px; border-radius:9999px; background-color:rgba(198,178,159,0.25); flex-shrink:0; margin-bottom:16px;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="opacity:0.6; flex-shrink:0;"><path d="M9 16.5C13.1421 16.5 16.5 13.1421 16.5 9C16.5 4.85786 13.1421 1.5 9 1.5C4.85786 1.5 1.5 4.85786 1.5 9C1.5 13.1421 4.85786 16.5 9 16.5Z" stroke="#1b1b1b" stroke-width="1.5"/><path d="M18 18L14.5 14.5" stroke="#1b1b1b" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input id="industry-b1-search" type="text" placeholder="Search" oninput="filterIndustryB1List()" style="flex:1; min-width:0; border:none; outline:none; background:none; font-family:'GT America', sans-serif; font-size:16px; color:#1b1b1b;" />
+        </div>
+
+        <div aria-label="Industry categories" id="industry-b1-list" style="display:flex; flex-direction:column;">
+          <button type="button" class="employment-cell" data-industry-b1="agriculture" data-label="agriculture" onclick="openIndustryStep2('agriculture')">
+            <span class="employment-cell__label">Agriculture</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="architecture-engineering" data-label="architecture & engineering" onclick="openIndustryStep2('architecture-engineering')">
+            <span class="employment-cell__label">Architecture & engineering</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="art-valuables" data-label="art & valuables" onclick="openIndustryStep2('art-valuables')">
+            <span class="employment-cell__label">Art & valuables</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="business-services" data-label="business services" onclick="openIndustryStep2('business-services')">
+            <span class="employment-cell__label">Business services</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="charities-religion" data-label="charities & religion" onclick="openIndustryStep2('charities-religion')">
+            <span class="employment-cell__label">Charities & religion</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="computers-it" data-label="computers & it" onclick="openIndustryStep2('computers-it')">
+            <span class="employment-cell__label">Computers & IT</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="construction" data-label="construction" onclick="openIndustryStep2('construction')">
+            <span class="employment-cell__label">Construction</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="crypto-assets" data-label="crypto assets" onclick="openIndustryStep2('crypto-assets')">
+            <span class="employment-cell__label">Crypto assets</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="design-marketing" data-label="design & marketing" onclick="openIndustryStep2('design-marketing')">
+            <span class="employment-cell__label">Design & marketing</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="education" data-label="education" onclick="openIndustryStep2('education')">
+            <span class="employment-cell__label">Education</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="energy-utilities" data-label="energy & utilities" onclick="openIndustryStep2('energy-utilities')">
+            <span class="employment-cell__label">Energy & utilities</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="finance" data-label="finance" onclick="openIndustryStep2('finance')">
+            <span class="employment-cell__label">Finance</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="gambling" data-label="gambling" onclick="openIndustryStep2('gambling')">
+            <span class="employment-cell__label">Gambling</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="healthcare" data-label="healthcare" onclick="openIndustryStep2('healthcare')">
+            <span class="employment-cell__label">Healthcare</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="hospitality" data-label="hospitality" onclick="openIndustryStep2('hospitality')">
+            <span class="employment-cell__label">Hospitality</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="legal-accounting" data-label="legal & accounting" onclick="openIndustryStep2('legal-accounting')">
+            <span class="employment-cell__label">Legal & accounting</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="manufacturing" data-label="manufacturing" onclick="openIndustryStep2('manufacturing')">
+            <span class="employment-cell__label">Manufacturing</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="media-entertainment" data-label="media & entertainment" onclick="openIndustryStep2('media-entertainment')">
+            <span class="employment-cell__label">Media & entertainment</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="mining" data-label="mining" onclick="openIndustryStep2('mining')">
+            <span class="employment-cell__label">Mining</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="personal-services" data-label="personal services" onclick="openIndustryStep2('personal-services')">
+            <span class="employment-cell__label">Personal services</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="public-services-military" data-label="public services & military" onclick="openIndustryStep2('public-services-military')">
+            <span class="employment-cell__label">Public services & military</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="real-estate" data-label="real estate" onclick="openIndustryStep2('real-estate')">
+            <span class="employment-cell__label">Real estate</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="retail" data-label="retail" onclick="openIndustryStep2('retail')">
+            <span class="employment-cell__label">Retail</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="science-research" data-label="science & research" onclick="openIndustryStep2('science-research')">
+            <span class="employment-cell__label">Science & research</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="telecommunications" data-label="telecommunications" onclick="openIndustryStep2('telecommunications')">
+            <span class="employment-cell__label">Telecommunications</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="transport-logistics" data-label="transport & logistics" onclick="openIndustryStep2('transport-logistics')">
+            <span class="employment-cell__label">Transport & logistics</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="travel" data-label="travel" onclick="openIndustryStep2('travel')">
+            <span class="employment-cell__label">Travel</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="vehicle-trade" data-label="vehicle trade" onclick="openIndustryStep2('vehicle-trade')">
+            <span class="employment-cell__label">Vehicle trade</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell" data-industry-b1="weapons-defence" data-label="weapons & defence" onclick="openIndustryStep2('weapons-defence')">
+            <span class="employment-cell__label">Weapons & defence</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+          <button type="button" class="employment-cell employment-cell--last" data-industry-b1="wholesale" data-label="wholesale" onclick="openIndustryStep2('wholesale')">
+            <span class="employment-cell__label">Wholesale</span>
+            <span class="industry-chevron" aria-hidden="true"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" style="transform:rotate(-90deg);"><path d="M8 9L0 1.04995L1.05655 0L6.59022 5.49912C7.37025 6.27427 8.62975 6.27427 9.40978 5.49912L14.9435 0L16 1.04995L8 9Z" fill="#1b1b1b"/></svg></span>
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <!-- ======================= 10C · INDUSTRY (OPTION B, STEP 2 — dynamic template) ======================= -->
+    <div class="screen" id="screen-industry-b-step2" style="display:none;">
+      <div class="home-indicator"><div class="pill" style="background:rgba(0,0,0,0.18);"></div></div>
+
+      <nav aria-label="Page navigation" style="position:absolute; top:16px; left:16px; z-index:10;">
+        <button aria-label="Back" class="flat-btn-light" onclick="industryB2Back()">
+          <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M2.68945 12L11.4697 3.21973L12.5303 4.28027L7.26765 9.54289C6.63769 10.1729 7.08386 11.25 7.97476 11.25H21V12.75H7.97476C7.08386 12.75 6.63769 13.8271 7.26765 14.4571L12.5303 19.7197L11.4697 20.7803L2.68945 12Z" fill="#1b1b1b"/></svg>
+        </button>
+      </nav>
+      <nav aria-label="Comparison toggle" style="position:absolute; top:16px; right:16px; z-index:10;">
+        <div id="industry-b2-compare-toggle" class="industry-compare-toggle" style="display:none;"></div>
+      </nav>
+
+      <main style="position:absolute; inset:0; overflow-y:auto; padding:118px 24px 220px;">
+        <h1 id="industry-b2-title" style="margin:0 0 8px; font-family:'N26 Sans', sans-serif; font-weight:500; font-size:32px; line-height:40px; color:#1b1b1b; font-feature-settings:'lnum' 1, 'tnum' 1;">Category</h1>
+        <p style="margin:0 0 24px; font-family:'GT America', sans-serif; font-size:16px; line-height:20px; color:#525252;">Select the subcategory that matches most closely.</p>
+
+        <div role="radiogroup" aria-label="Industry subcategory" id="industry-b2-list" style="display:flex; flex-direction:column;"></div>
+      </main>
+
+      <footer style="position:absolute; bottom:0; left:0; right:0; padding:0 16px 34px; background-color:#faf8f5;">
+        <button aria-label="Continue" class="pill-btn pill-btn--primary" onclick="industryBContinue()">Continue</button>
       </footer>
     </div>
 
@@ -3562,56 +3776,56 @@
             <span class="employment-cell__label">Own business revenue</span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-income="investments" data-label="investments stocks dividends funds" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('investments')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Investments</span><span class="employment-cell__description">Stocks, dividends, funds</span></span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
           <button type="button" class="employment-cell" data-income="crypto-trading" data-label="crypto trading" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('crypto-trading')">
             <span class="employment-cell__label">Crypto trading</span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="employment-cell" data-income="rental-income" data-label="rental income" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('rental-income')">
-            <span class="employment-cell__label">Rental income</span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="employment-cell" data-income="sale-of-assets" data-label="sale of assets property vehicles etc" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('sale-of-assets')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Sale of assets</span><span class="employment-cell__description">Property, vehicles, etc</span></span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="employment-cell" data-income="pension-retirement-funds" data-label="pension or retirement funds" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('pension-retirement-funds')">
-            <span class="employment-cell__label">Pension or retirement funds</span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="employment-cell" data-income="government-benefits-social-welfare" data-label="government benefits or social welfare" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('government-benefits-social-welfare')">
-            <span class="employment-cell__label">Government benefits or social welfare</span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="employment-cell" data-income="loans-credit" data-label="loans or credit" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('loans-credit')">
-            <span class="employment-cell__label">Loans or credit</span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="employment-cell" data-income="personal-savings" data-label="personal savings" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('personal-savings')">
-            <span class="employment-cell__label">Personal savings</span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="employment-cell" data-income="family-support" data-label="family support financial help from parents relatives or partner" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('family-support')">
-            <span class="employment-cell__text"><span class="employment-cell__label">Family support</span><span class="employment-cell__description">Financial help from parents, relatives, or partner</span></span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="employment-cell" data-income="inheritance" data-label="inheritance" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('inheritance')">
-            <span class="employment-cell__label">Inheritance</span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
           <button type="button" class="employment-cell" data-income="donations" data-label="donations crowdfunding charity individual donors" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('donations')">
             <span class="employment-cell__text"><span class="employment-cell__label">Donations</span><span class="employment-cell__description">Crowdfunding, charity, individual donors</span></span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
+          <button type="button" class="employment-cell" data-income="family-support" data-label="family support financial help from parents relatives or partner" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('family-support')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Family support</span><span class="employment-cell__description">Financial help from parents, relatives, or partner</span></span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell" data-income="government-benefits-social-welfare" data-label="government benefits or social welfare" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('government-benefits-social-welfare')">
+            <span class="employment-cell__label">Government benefits or social welfare</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
           <button type="button" class="employment-cell" data-income="grants" data-label="grants research grants government funding scholarships" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('grants')">
             <span class="employment-cell__text"><span class="employment-cell__label">Grants</span><span class="employment-cell__description">Research grants, government funding, scholarships</span></span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell employment-cell--last" data-income="lottery-winning" data-label="lottery winning" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('lottery-winning')">
+          <button type="button" class="employment-cell" data-income="inheritance" data-label="inheritance" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('inheritance')">
+            <span class="employment-cell__label">Inheritance</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell" data-income="investments" data-label="investments stocks dividends funds" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('investments')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Investments</span><span class="employment-cell__description">Stocks, dividends, funds</span></span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell" data-income="loans-credit" data-label="loans or credit" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('loans-credit')">
+            <span class="employment-cell__label">Loans or credit</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell" data-income="lottery-winning" data-label="lottery winning" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('lottery-winning')">
             <span class="employment-cell__label">Lottery winning</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell" data-income="pension-retirement-funds" data-label="pension or retirement funds" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('pension-retirement-funds')">
+            <span class="employment-cell__label">Pension or retirement funds</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell" data-income="personal-savings" data-label="personal savings" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('personal-savings')">
+            <span class="employment-cell__label">Personal savings</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell" data-income="rental-income" data-label="rental income" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('rental-income')">
+            <span class="employment-cell__label">Rental income</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell employment-cell--last" data-income="sale-of-assets" data-label="sale of assets property vehicles etc" role="checkbox" aria-checked="false" onclick="toggleIncomeSource('sale-of-assets')">
+            <span class="employment-cell__text"><span class="employment-cell__label">Sale of assets</span><span class="employment-cell__description">Property, vehicles, etc</span></span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
         </div>
@@ -3861,6 +4075,10 @@
             <span class="employment-cell__label">Receiving salary or pension</span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
+          <button type="button" class="employment-cell" data-usage="cryptocurrency" role="checkbox" aria-checked="false" onclick="toggleAccountUsage('cryptocurrency')">
+            <span class="employment-cell__label">Cryptocurrency</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
           <button type="button" class="employment-cell" data-usage="everyday-spending-bills" role="checkbox" aria-checked="false" onclick="toggleAccountUsage('everyday-spending-bills')">
             <span class="employment-cell__label">Everyday spending and bills</span>
             <span class="employment-checkbox" aria-hidden="true"></span>
@@ -3869,24 +4087,20 @@
             <span class="employment-cell__label">Freelance or business income</span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell" data-usage="savings" role="checkbox" aria-checked="false" onclick="toggleAccountUsage('savings')">
-            <span class="employment-cell__label">Savings</span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="employment-cell" data-usage="travel-international-transfers" role="checkbox" aria-checked="false" onclick="toggleAccountUsage('travel-international-transfers')">
-            <span class="employment-cell__label">Travel or international transfers</span>
-            <span class="employment-checkbox" aria-hidden="true"></span>
-          </button>
           <button type="button" class="employment-cell" data-usage="online-shopping" role="checkbox" aria-checked="false" onclick="toggleAccountUsage('online-shopping')">
             <span class="employment-cell__label">Online shopping</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell" data-usage="savings" role="checkbox" aria-checked="false" onclick="toggleAccountUsage('savings')">
+            <span class="employment-cell__label">Savings</span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
           <button type="button" class="employment-cell" data-usage="trading-investments" role="checkbox" aria-checked="false" onclick="toggleAccountUsage('trading-investments')">
             <span class="employment-cell__label">Trading and investments</span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell employment-cell--last" data-usage="cryptocurrency" role="checkbox" aria-checked="false" onclick="toggleAccountUsage('cryptocurrency')">
-            <span class="employment-cell__label">Cryptocurrency</span>
+          <button type="button" class="employment-cell employment-cell--last" data-usage="travel-international-transfers" role="checkbox" aria-checked="false" onclick="toggleAccountUsage('travel-international-transfers')">
+            <span class="employment-cell__label">Travel or international transfers</span>
             <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
         </div>
@@ -3907,39 +4121,28 @@
       </nav>
 
       <main style="position:absolute; inset:0; overflow-y:auto; padding:118px 24px 220px;">
-        <h1 style="margin:0 0 16px; font-family:'N26 Sans', sans-serif; font-weight:500; font-size:32px; line-height:40px; color:#1b1b1b; font-feature-settings:'lnum' 1, 'tnum' 1;">Are you considered a politically exposed person?</h1>
+        <h1 style="margin:0 0 8px; font-family:'N26 Sans', sans-serif; font-weight:500; font-size:32px; line-height:40px; color:#1b1b1b; font-feature-settings:'lnum' 1, 'tnum' 1;">Do any of these apply to you, your spouse, parent, or child?</h1>
+        <p style="margin:0 0 24px; font-family:'GT America', sans-serif; font-size:16px; line-height:20px; color:#525252;">If you aren't sure, it likely doesn't apply to you.</p>
 
-        <div class="help-link" onclick="openPepInfoSheet()" style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:24px;">
-          <span style="display:flex; align-items:center; justify-content:center; width:16px; height:16px; background:#1b1b1b; border-radius:9999px; color:#fff; font-family:'GT America', sans-serif; font-size:10px; font-weight:600; line-height:1;">?</span>
-          <span style="font-family:'GT America', sans-serif; font-size:14px; color:#1b1b1b; text-decoration:underline;">What is a politically exposed person?</span>
-        </div>
-
-        <div role="radiogroup" aria-label="Politically exposed person" style="display:flex; flex-direction:column;">
-          <button type="button" class="employment-cell" data-pep="yes" role="radio" aria-checked="false" onclick="selectPep('yes')">
-            <span class="employment-cell__label">Yes</span>
-            <span class="employment-radio" aria-hidden="true"></span>
+        <div role="group" aria-label="Politically exposed person" style="display:flex; flex-direction:column;">
+          <button type="button" class="employment-cell" data-pep-fact="political-role" role="checkbox" aria-checked="false" onclick="togglePepFact('political-role')">
+            <span class="employment-cell__text"><span class="employment-cell__label">A prominent political role in the last 2 years</span><span class="employment-cell__description">Head of state, minister, member of parliament</span></span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
           </button>
-          <button type="button" class="employment-cell employment-cell--last" data-pep="no" role="radio" aria-checked="false" onclick="selectPep('no')">
-            <span class="employment-cell__label">No</span>
+          <button type="button" class="employment-cell" data-pep-fact="senior-leadership" role="checkbox" aria-checked="false" onclick="togglePepFact('senior-leadership')">
+            <span class="employment-cell__label">Senior leadership of a state-owned company or major public institution in the last 2 years</span>
+            <span class="employment-checkbox" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="employment-cell employment-cell--last" data-pep-fact="none" role="radio" aria-checked="false" onclick="selectPepNone()">
+            <span class="employment-cell__label">None of these apply to me</span>
             <span class="employment-radio" aria-hidden="true"></span>
           </button>
         </div>
       </main>
 
       <footer style="position:absolute; bottom:0; left:0; right:0; padding:0 16px 34px; background-color:#faf8f5;">
-        <button aria-label="Continue" class="pill-btn pill-btn--primary" onclick="guardedNavigate('screen-pep','screen-status-identity','forward', pepSelected !== null)">Continue</button>
+        <button aria-label="Continue" class="pill-btn pill-btn--primary" onclick="guardedNavigate('screen-pep','screen-status-identity','forward', pepHasSelection())">Continue</button>
       </footer>
-
-      <div id="pep-info-sheet-overlay" class="aml-info-sheet-overlay">
-        <div class="aml-info-sheet">
-          <button class="aml-info-sheet-close" aria-label="Close" onclick="closePepInfoSheet()">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 2.5l11 11M13.5 2.5l-11 11" stroke="#1b1b1b" stroke-width="1.75" stroke-linecap="round"/></svg>
-          </button>
-          <h2 class="aml-info-sheet-title">What is a politically exposed person?</h2>
-          <p class="aml-info-sheet-text">You'd be considered a politically exposed person if you hold or have held in the last 2 years a role in politics, a senior management position in the public sector or state-owned company, or if you are a close relative of a person that fits this condition.</p>
-          <button class="pill-btn pill-btn--primary" onclick="closePepInfoSheet()">Got it</button>
-        </div>
-      </div>
     </div>
 
     <!-- ======================= 08H · STATUS · VERIFY YOUR IDENTITY ======================= -->
@@ -4008,10 +4211,20 @@
       </main>
 
       <footer style="position:absolute; bottom:0; left:0; right:0; padding:16px 16px 34px; background-color:#faf8f5;">
-        <button aria-label="Continue" class="pill-btn pill-btn--primary" onclick="navigate('screen-status-identity','screen-idv-flow','forward')">Continue</button>
+        <button aria-label="Continue" class="pill-btn pill-btn--primary" onclick="startIndustryComparison()">Continue</button>
       </footer>
     </div>
 
+    <!-- ======================= 08I · PROTOTYPE END (moderator only) ======================= -->
+    <div class="screen" id="screen-prototype-end" style="display:none;">
+      <div class="home-indicator"><div class="pill" style="background:rgba(0,0,0,0.18);"></div></div>
+      <main style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:24px; text-align:center;">
+        <h1 style="margin:0; font-family:'N26 Sans', sans-serif; font-weight:500; font-size:24px; line-height:32px; color:#1b1b1b;">That's the end of this prototype</h1>
+        <p style="margin:0; font-family:'GT America', sans-serif; font-size:16px; line-height:20px; color:#525252;">Thanks for going through it with us.</p>
+      </main>
+    </div>
+
+    <!-- screen-idv-flow below is a pre-existing citizenship/IDV mini-flow, not used by this test — left in place, unreferenced -->
     <div id="screen-idv-flow" class="screen" style="display:none;">
       <div class="idv-scope">
   <div class="phone" data-modal-open="false" data-modal-multiselect-open="false" data-modal-info-open="false" data-modal-residence-permit-open="false">
@@ -6151,6 +6364,15 @@ var FLAG_DATA_URIS = {
   var EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
   var DURATION = 350;
 
+  /* ---------- Industry A/B test: flow picker + comparison detour ---------- */
+  var MAIN_INDUSTRY_VARIANT = null; // 'a' | 'b' — set once via the flow picker, drives the main pass
+  var INDUSTRY_MODE = 'main'; // 'main' | 'compare' — 'compare' shows the alternate variant + toggle at the end
+  var lastIndustryScreenId = null; // tracks which industry screen is currently on-stack, for back-nav
+  function selectFlow(variant) {
+    MAIN_INDUSTRY_VARIANT = variant;
+    navigate('screen-flow-picker', 'screen-welcome', 'forward');
+  }
+
   /* ---------- AMLQ validation toast ---------- */
   var amlToastTimer = null;
   function showAmlToast() {
@@ -6686,12 +6908,18 @@ var FLAG_DATA_URIS = {
       navigate('screen-employment-status', 'screen-income-source', 'forward');
     } else {
       skippedIndustry = false;
-      navigate('screen-employment-status', 'screen-industry', 'forward');
+      if (MAIN_INDUSTRY_VARIANT === 'b') {
+        lastIndustryScreenId = 'screen-industry-b-step1';
+        navigate('screen-employment-status', 'screen-industry-b-step1', 'forward');
+      } else {
+        lastIndustryScreenId = 'screen-industry';
+        navigate('screen-employment-status', 'screen-industry', 'forward');
+      }
     }
   }
 
-  /* ---------- Industry ---------- */
-  var INDUSTRY_VALUES = ['accommodation-food-services', 'administrative-support-services', 'agriculture-forestry-fishing', 'banking-insurance-financial-services', 'construction-architecture-engineering', 'cryptocurrency-digital-assets', 'design-advertising-marketing-services', 'education-science', 'energy-water-waste-management', 'gambling', 'health-social-welfare-veterinary-services', 'art-jewelry-pawn', 'legal-tax-accounting-services', 'manufacturing-industrial-production', 'media-arts-entertainment', 'mining-quarrying', 'personal-household-services', 'public-services-military', 'real-estate', 'telecommunications-it', 'transportation-storage-logistics', 'travel-agencies-tour-operators', 'trusts-charities-religious-organisations', 'vehicle-trade-repair', 'weapons-ammunition-defence-trade', 'wholesale-retail'];
+  /* ---------- Industry — Option A (one-step) ---------- */
+  var INDUSTRY_VALUES = ['agriculture-farming', 'art-jewelry', 'banking-insurance', 'charities-religious-organisations', 'construction-engineering', 'crypto', 'design-marketing', 'education-science', 'energy-utilities', 'gambling', 'healthcare', 'hospitality', 'legal-accounting', 'manufacturing', 'media-entertainment', 'mining-quarrying', 'office-cleaning-security-services', 'personal-services', 'public-services-military', 'real-estate', 'telecom-it', 'transport-logistics', 'travel-tourism', 'vehicle-trade-repair', 'weapons-defence', 'wholesale-retail'];
   var industrySelected = null;
   function selectIndustry(value) {
     industrySelected = value;
@@ -6707,9 +6935,145 @@ var FLAG_DATA_URIS = {
       cell.style.display = cell.dataset.label.indexOf(query) !== -1 ? 'flex' : 'none';
     });
   }
+  function industryAContinue() {
+    if (industrySelected === null) { showAmlToast(); return; }
+    if (INDUSTRY_MODE === 'compare') {
+      navigate('screen-industry', 'screen-prototype-end', 'forward');
+    } else {
+      lastIndustryScreenId = 'screen-industry';
+      navigate('screen-industry', 'screen-income-source', 'forward');
+    }
+  }
+
+  /* ---------- Industry — Option B (two-step: category, then subcategory) ---------- */
+  var INDUSTRY_B_DATA = {
+    'agriculture': { label: 'Agriculture', subcategories: ['Farming & crop production', 'Forestry & logging', 'Fishing & aquaculture'] },
+    'architecture-engineering': { label: 'Architecture & engineering', subcategories: ['Architecture firms', 'Civil engineering', 'Interior design'] },
+    'art-valuables': { label: 'Art & valuables', subcategories: ['Art & antiques', 'Jewellery & precious metals', 'Pawnbroking'] },
+    'business-services': { label: 'Business services', subcategories: ['Office administration', 'Cleaning services', 'Security services'] },
+    'charities-religion': { label: 'Charities & religion', subcategories: ['Charities & foundations', 'Religious institutions', 'Trusts'] },
+    'computers-it': { label: 'Computers & IT', subcategories: ['Software development', 'IT support', 'Data & cloud services'] },
+    'construction': { label: 'Construction', subcategories: ['Residential & commercial building', 'Roadworks & infrastructure', 'Construction trades'] },
+    'crypto-assets': { label: 'Crypto assets', subcategories: ['Blockchain & Web3 services', 'Crypto trading & investment'] },
+    'design-marketing': { label: 'Design & marketing', subcategories: ['Advertising', 'Graphic & product design', 'PR & communications'] },
+    'education': { label: 'Education', subcategories: ['Schools & universities', 'Private tutoring', 'Educational technology'] },
+    'energy-utilities': { label: 'Energy & utilities', subcategories: ['Power generation', 'Water utilities', 'Waste management'] },
+    'finance': { label: 'Finance', subcategories: ['Banking', 'Insurance', 'Investment & asset management'] },
+    'gambling': { label: 'Gambling', subcategories: ['Online betting', 'Casinos & betting shops', 'Lottery'] },
+    'healthcare': { label: 'Healthcare', subcategories: ['Hospitals & clinics', 'Social care', 'Veterinary services'] },
+    'hospitality': { label: 'Hospitality', subcategories: ['Hotels', 'Restaurants', 'Catering'] },
+    'legal-accounting': { label: 'Legal & accounting', subcategories: ['Law firms', 'Bookkeeping', 'Tax advisors'] },
+    'manufacturing': { label: 'Manufacturing', subcategories: ['Food & drink', 'Textiles', 'Electronics'] },
+    'media-entertainment': { label: 'Media & entertainment', subcategories: ['Film & TV', 'Publishing', 'Museums'] },
+    'mining': { label: 'Mining', subcategories: ['Metals & minerals', 'Quarrying', 'Oil & gas'] },
+    'personal-services': { label: 'Personal services', subcategories: ['Hairdressing', 'Domestic staff', 'Repairs'] },
+    'public-services-military': { label: 'Public services & military', subcategories: ['Public administration', 'Customs', 'Police'] },
+    'real-estate': { label: 'Real estate', subcategories: ['Property sales', 'Rentals', 'Development'] },
+    'retail': { label: 'Retail', subcategories: ['Shops', 'Online retail'] },
+    'science-research': { label: 'Science & research', subcategories: ['R&D', 'Laboratories'] },
+    'telecommunications': { label: 'Telecommunications', subcategories: ['Internet & mobile providers', 'Network infrastructure', 'Broadcasting'] },
+    'transport-logistics': { label: 'Transport & logistics', subcategories: ['Freight', 'Storage & warehousing', 'Passenger transport'] },
+    'travel': { label: 'Travel', subcategories: ['Tour operators', 'Booking platforms'] },
+    'vehicle-trade': { label: 'Vehicle trade', subcategories: ['Dealerships', 'Maintenance'] },
+    'weapons-defence': { label: 'Weapons & defence', subcategories: ['Firearms', 'Defence equipment'] },
+    'wholesale': { label: 'Wholesale', subcategories: ['Wholesale distribution', 'Import/export trade'] }
+  };
+  var industryB1CategorySelected = null;
+  var industryB2Selected = null;
+  function filterIndustryB1List() {
+    var query = document.getElementById('industry-b1-search').value.trim().toLowerCase();
+    var list = document.getElementById('industry-b1-list');
+    Array.prototype.forEach.call(list.children, function (cell) {
+      cell.style.display = cell.dataset.label.indexOf(query) !== -1 ? 'flex' : 'none';
+    });
+  }
+  function openIndustryStep2(categoryKey) {
+    industryB1CategorySelected = categoryKey;
+    industryB2Selected = null;
+    var data = INDUSTRY_B_DATA[categoryKey];
+    document.getElementById('industry-b2-title').textContent = data.label;
+    var rows = data.subcategories.map(function (sub, i) {
+      var value = 'sub-' + i;
+      var lastClass = i === data.subcategories.length - 1 ? ' employment-cell--last' : '';
+      return '<button type="button" class="employment-cell' + lastClass + '" data-industry-b2="' + value + '" role="radio" aria-checked="false" onclick="selectIndustryB2(\'' + value + '\')">' +
+        '<span class="employment-cell__label">' + sub + '</span>' +
+        '<span class="employment-radio" aria-hidden="true"></span></button>';
+    });
+    document.getElementById('industry-b2-list').innerHTML = rows.join('');
+    if (INDUSTRY_MODE === 'compare') { compareActiveScreenId = 'screen-industry-b-step2'; }
+    navigate('screen-industry-b-step1', 'screen-industry-b-step2', 'forward');
+  }
+  function selectIndustryB2(value) {
+    industryB2Selected = value;
+    var list = document.getElementById('industry-b2-list');
+    Array.prototype.forEach.call(list.children, function (cell) {
+      cell.setAttribute('aria-checked', cell.dataset.industryB2 === value ? 'true' : 'false');
+    });
+  }
+  function industryBContinue() {
+    if (industryB2Selected === null) { showAmlToast(); return; }
+    if (INDUSTRY_MODE === 'compare') {
+      navigate('screen-industry-b-step2', 'screen-prototype-end', 'forward');
+    } else {
+      lastIndustryScreenId = 'screen-industry-b-step2';
+      navigate('screen-industry-b-step2', 'screen-income-source', 'forward');
+    }
+  }
+  function industryB2Back() {
+    if (INDUSTRY_MODE === 'compare') { compareActiveScreenId = 'screen-industry-b-step1'; }
+    navigate('screen-industry-b-step2', 'screen-industry-b-step1', 'backward');
+  }
+
+  /* ---------- Industry comparison detour (moderator-facing, end of flow) ---------- */
+  var compareActiveVariant = null; // 'a' | 'b' — which variant is on screen while INDUSTRY_MODE === 'compare'
+  var compareActiveScreenId = null;
+  var INDUSTRY_COMPARE_TOGGLE_HTML =
+    '<div class="industry-compare-toggle__inner">' +
+      '<button type="button" class="industry-compare-toggle__switch" role="switch" aria-checked="false" aria-label="Compare with the other option" onclick="toggleComparisonVariant()">' +
+        '<span class="industry-compare-toggle__knob"></span>' +
+      '</button>' +
+    '</div>';
+  function startIndustryComparison() {
+    INDUSTRY_MODE = 'compare';
+    compareActiveVariant = MAIN_INDUSTRY_VARIANT === 'b' ? 'a' : 'b';
+    compareActiveScreenId = compareActiveVariant === 'a' ? 'screen-industry' : 'screen-industry-b-step1';
+    showIndustryCompareToggle();
+    navigate('screen-status-identity', compareActiveScreenId, 'forward');
+  }
+  function showIndustryCompareToggle() {
+    ['industry-a-compare-toggle', 'industry-b1-compare-toggle', 'industry-b2-compare-toggle'].forEach(function (id) {
+      var el = document.getElementById(id);
+      el.innerHTML = INDUSTRY_COMPARE_TOGGLE_HTML;
+      el.style.display = 'block';
+    });
+    updateIndustryCompareToggleState();
+  }
+  function updateIndustryCompareToggleState() {
+    Array.prototype.forEach.call(document.querySelectorAll('.industry-compare-toggle__switch'), function (btn) {
+      btn.setAttribute('aria-checked', compareActiveVariant === 'b' ? 'true' : 'false');
+    });
+  }
+  function toggleComparisonVariant() {
+    setComparisonVariant(compareActiveVariant === 'a' ? 'b' : 'a');
+  }
+  function setComparisonVariant(variant) {
+    if (variant === compareActiveVariant) return;
+    var fromEl = document.getElementById(compareActiveScreenId);
+    var toId = variant === 'a' ? 'screen-industry' : 'screen-industry-b-step1';
+    var toEl = document.getElementById(toId);
+    compareActiveVariant = variant;
+    compareActiveScreenId = toId;
+    fromEl.style.display = 'none';
+    toEl.style.display = 'block';
+    toEl.style.transition = 'none';
+    toEl.style.transform = 'none';
+    toEl.style.opacity = '1';
+    toEl.style.zIndex = '';
+    updateIndustryCompareToggleState();
+  }
 
   /* ---------- Income source (multi-select) ---------- */
-  var INCOME_SOURCE_VALUES = ['employment', 'self-employment-freelance', 'own-business-revenue', 'investments', 'crypto-trading', 'rental-income', 'sale-of-assets', 'pension-retirement-funds', 'government-benefits-social-welfare', 'loans-credit', 'personal-savings', 'family-support', 'inheritance', 'donations', 'grants', 'lottery-winning'];
+  var INCOME_SOURCE_VALUES = ['employment', 'self-employment-freelance', 'own-business-revenue', 'crypto-trading', 'donations', 'family-support', 'government-benefits-social-welfare', 'grants', 'inheritance', 'investments', 'loans-credit', 'lottery-winning', 'pension-retirement-funds', 'personal-savings', 'rental-income', 'sale-of-assets'];
   var incomeSourceSelected = new Set();
   function toggleIncomeSource(value) {
     var cell = document.querySelector('.employment-cell[data-income="' + value + '"]');
@@ -6732,7 +7096,7 @@ var FLAG_DATA_URIS = {
     if (skippedIndustry) {
       navigate('screen-income-source', 'screen-employment-status', 'backward');
     } else {
-      navigate('screen-income-source', 'screen-industry', 'backward');
+      navigate('screen-income-source', lastIndustryScreenId || 'screen-industry', 'backward');
     }
   }
 
@@ -7070,7 +7434,7 @@ var FLAG_DATA_URIS = {
   }
 
   /* ---------- Account usage (multi-select) ---------- */
-  var ACCOUNT_USAGE_VALUES = ['receiving-salary-pension', 'everyday-spending-bills', 'freelance-business-income', 'savings', 'travel-international-transfers', 'online-shopping', 'trading-investments', 'cryptocurrency'];
+  var ACCOUNT_USAGE_VALUES = ['receiving-salary-pension', 'cryptocurrency', 'everyday-spending-bills', 'freelance-business-income', 'online-shopping', 'savings', 'trading-investments', 'travel-international-transfers'];
   var accountUsageSelected = new Set();
   function toggleAccountUsage(value) {
     var cell = document.querySelector('.employment-cell[data-usage="' + value + '"]');
@@ -7091,19 +7455,32 @@ var FLAG_DATA_URIS = {
   }
 
   /* ---------- PEP ---------- */
-  var pepSelected = null;
-  function selectPep(value) {
-    pepSelected = value;
-    ['yes', 'no'].forEach(function (v) {
-      var cell = document.querySelector('.employment-cell[data-pep="' + v + '"]');
-      cell.setAttribute('aria-checked', v === value ? 'true' : 'false');
+  var PEP_FACT_VALUES = ['political-role', 'senior-leadership'];
+  var pepFactsSelected = new Set();
+  var pepNoneSelected = false;
+  function updatePepUI() {
+    PEP_FACT_VALUES.forEach(function (v) {
+      var cell = document.querySelector('.employment-cell[data-pep-fact="' + v + '"]');
+      cell.setAttribute('aria-checked', pepFactsSelected.has(v) ? 'true' : 'false');
     });
+    document.querySelector('.employment-cell[data-pep-fact="none"]').setAttribute('aria-checked', pepNoneSelected ? 'true' : 'false');
   }
-  function openPepInfoSheet() {
-    document.getElementById('pep-info-sheet-overlay').classList.add('is-open');
+  function togglePepFact(value) {
+    if (pepFactsSelected.has(value)) {
+      pepFactsSelected.delete(value);
+    } else {
+      pepFactsSelected.add(value);
+      pepNoneSelected = false;
+    }
+    updatePepUI();
   }
-  function closePepInfoSheet() {
-    document.getElementById('pep-info-sheet-overlay').classList.remove('is-open');
+  function selectPepNone() {
+    pepNoneSelected = true;
+    pepFactsSelected.clear();
+    updatePepUI();
+  }
+  function pepHasSelection() {
+    return pepNoneSelected || pepFactsSelected.size > 0;
   }
 
   /* ---------- Terms & Conditions ---------- */
